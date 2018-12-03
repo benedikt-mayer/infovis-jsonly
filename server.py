@@ -1,24 +1,28 @@
-import mysql.connector
-import datetime
+from flask import Flask, request
+from flask_restful import Resource, Api
+from flaskext.mysql import MySQL
+app = Flask(__name__)
+mysql = MySQL()
+api = Api(app)
 
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+app.config['MYSQL_DATABASE_DB'] = 'newspapers'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)
 
-cnx = mysql.connector.connect(user='root', password='root',
-                              host='127.0.0.1',
-                              database='newspapers', auth_plugin='mysql_native_password')
+class Title(Resource):
+    def get(self):
 
-cursor = cnx.cursor()
+        conn = mysql.connect()
+        cursor =conn.cursor()
 
-# query = ("SELECT *"
-#          "FROM newspapers.tokens AS token"
-#          "INNER JOIN newspapers.documents_tokens AS doc_token"
-#          "WHERE token.id = doc_token.token_id AND doc_token.document_id = 1;")
-query = ("SELECT title, description FROM newspapers.documents;")
+        cursor.execute("SELECT title, description FROM newspapers.documents")
+        data = cursor.fetchone()
+        
+        return str(data)
 
-cursor.execute(query)
+api.add_resource(Title, '/') # Route_1
 
-for (title, description) in cursor:
-    print("title: {}, description: {}".format(
-        title, description))
-
-cursor.close()
-cnx.close()
+if __name__ == '__main__':
+     app.run(port='5002')
