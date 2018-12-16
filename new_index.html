@@ -1,58 +1,33 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="../../../../favicon.ico">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
-    <style>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="stylesheet" href="/styles.css">
+  <title>Sentiment analysis of newspapers</title>
+</head>
 
-            .links line {
-              stroke: #999;
-              stroke-opacity: 0.6;
-            }
-            
-            .nodes circle {
-              stroke: #fff;
-              stroke-width: 1.5px;
-            }
-            
-            text {
-              font-family: sans-serif;
-              font-size: 10px;
-            }
-            
-            </style>
-    <title>Sentiment analysis of newspapers</title>
+<body>
+  <h4>Sentinment analysis of newspapers</h4>
+  <svg width="1200" height="900"></svg>
 
-    <!-- Bootstrap core CSS -->
-    <link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
+  <div class="slidecontainer">
+    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+  </div>
 
-
-  </head>
-
-  <body>
-        <h4>Sentinment analysis of newspapers</h4>
-        <svg width="1200" height="900"></svg>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
+  <div id="placeholder">placeholder</div>
+  <!-- D3 library-->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script src="force_new.js"></script>
+  <script src="./frontend.js"></script>
 
 
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+</body>
 
-    <!-- D3 library-->
-    <script src="http://marvl.infotech.monash.edu/webcola/cola.min.js"></script>
-    <!--<script src="force_directed_graph_script.js"></script>-->
-    <!--<script src="force_with_distance_script.js"></script>-->
-    <script src="force_new.js"></script>
-
-
-
-    
-  </body>
 </html>
