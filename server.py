@@ -30,23 +30,21 @@ class Title(Resource):
                  "INNER JOIN newspapers.documents AS doc "
                  "WHERE token.id = doc_token.token_id "
                  "AND doc_token.document_id = doc.id "
-				 "AND date not like '-'"
-                 "LIMIT 0, 200")
+                 "AND date not like '-' "
+                 "LIMIT 0, 10000")
         cursor.execute(query)
         articles = dict()
         data = cursor.fetchall()
         for item in data:
-            if len(articles) < item[0]:
+            if not (item[0] in articles):
                 articles[item[0]] = item[1]
             else:
                 articles[item[0]] = articles[item[0]] + \
                     " " + item[1]
-        print(articles[1])
+        print(articles)
+        print("size: " + str(len(articles)))
         return articles[1]
 
-
-
-		
 
 api.add_resource(Title, '/')  # Route_1
 
@@ -56,19 +54,21 @@ def getSentiment(news_text):
         'document': {
             'text': news_text,
             'type': 'default'
-		},
-        'results': [{'name':'friendly', 'patterns': False},
-            {'name':'aggressive', 'patterns': False}],
+        },
+        'results': [{'name': 'friendly', 'patterns': False},
+                    {'name': 'aggressive', 'patterns': False}],
         'patterns': False
-	}
+    }
     url = 'https://api.precire.ai/v0.11'
     payload = json.dumps(request_body)
-    response = requests.post(url,payload)
+    response = requests.post(url, payload)
     #r = requests.get("https://jsonplaceholder.typicode.com/todos/1")
     print(response.content)
 
+
 def addSentimentToFile():
     return json
+
 
 if __name__ == '__main__':
     getSentiment("Ich hasse alle Leute")
