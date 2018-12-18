@@ -62,7 +62,7 @@ def getSentiment(news_text):
     url = 'https://api.precire.ai/v0.11'
     payload = json.dumps(request_body)
     response = requests.post(url, payload)
-    #r = requests.get("https://jsonplaceholder.typicode.com/todos/1")
+    # r = requests.get("https://jsonplaceholder.typicode.com/todos/1")
     print(response.content)
 
 
