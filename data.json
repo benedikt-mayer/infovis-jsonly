@@ -1,34 +1,70 @@
 {
-    "results": {
-        "aggressive": {
-            "percentile": 43
-        },
-        "composed": {
-            "percentile": 30
-        },
-        "goal_oriented": {
-            "percentile": 49
-        },
-        "motivating": {
-            "percentile": 31
-        },
-        "optimistic": {
-            "percentile": 38
-        },
-        "positive": {
-            "percentile": 33
-        },
-        "reliable": {
-            "percentile": 73
-        },
-        "self_confident": {
-            "percentile": 61
-        },
-        "supportive": {
-            "percentile": 45
-        },
-        "visionary": {
-            "percentile": 41
+    "0": {
+        "results": {
+            "aggressive": {
+                "percentile": 43
+            },
+            "composed": {
+                "percentile": 30
+            },
+            "goal_oriented": {
+                "percentile": 49
+            },
+            "motivating": {
+                "percentile": 31
+            },
+            "optimistic": {
+                "percentile": 38
+            },
+            "positive": {
+                "percentile": 33
+            },
+            "reliable": {
+                "percentile": 73
+            },
+            "self_confident": {
+                "percentile": 61
+            },
+            "supportive": {
+                "percentile": 45
+            },
+            "visionary": {
+                "percentile": 41
+            }
+        }
+    },
+    "1": {
+        "results": {
+            "aggressive": {
+                "percentile": 27
+            },
+            "composed": {
+                "percentile": 87
+            },
+            "goal_oriented": {
+                "percentile": 20
+            },
+            "motivating": {
+                "percentile": 91
+            },
+            "optimistic": {
+                "percentile": 65
+            },
+            "positive": {
+                "percentile": 23
+            },
+            "reliable": {
+                "percentile": 98
+            },
+            "self_confident": {
+                "percentile": 12
+            },
+            "supportive": {
+                "percentile": 58
+            },
+            "visionary": {
+                "percentile": 23
+            }
         }
     }
 }

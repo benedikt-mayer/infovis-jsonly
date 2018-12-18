@@ -5,6 +5,7 @@ from flask_cors import CORS
 from flaskext.mysql import MySQL
 import requests
 import json
+import collections
 app = Flask(__name__)
 mysql = MySQL()
 api = Api(app)
@@ -29,15 +30,23 @@ api.add_resource(Title, '/')  # Route_1
 
 def getDataFromJson():
     with open('data.json') as data_file:
-        data = json.load(data_file)["results"]
+        data = json.load(data_file)
 
-        for key in data.keys():
-            data[key] = data[key]["percentile"] / 100.0
+        print(data.keys())
 
-        data["Name"] = "Bernd Baumann"
-        data["Zeitung"] = "Süddeutsche Zeitung"
-        print(data)
-        return data
+        result = collections.defaultdict(dict)
+
+        for index in data.keys():
+            for key in data[index]["results"].keys():
+                value = data[index]["results"][key]["percentile"] / 100.0
+                result[int(index)][key] = value
+                # result.update(int(index): key)
+                # result.update([int(index)][key]: value)
+
+            result[int(index)]["Name"] = "Bernd Baumann"
+            result[int(index)]["Zeitung"] = "Süddeutsche Zeitung"
+        print(result)
+        return result
 
 
 def getArticles():

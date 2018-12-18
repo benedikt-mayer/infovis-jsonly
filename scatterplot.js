@@ -13,19 +13,30 @@ async function fetchAsync(url) {
         mode: 'cors'
     });
     let data = await response.json();
-    formattedData = {
-        x: data.aggressive,
-        y: data.positive,
-        Name: data.Name,
-        Zeitung: data.Zeitung
-    }
+    console.log(data);
+    formattedData = Object.values(data).map(element => {
+        return [
+            element.aggressive,
+            element.positive,
+            element.Name,
+            element.Zeitung
+        ]
+    })
+    // formattedData = {
+    //     x: data.aggressive,
+    //     y: data.positive,
+    //     Name: data.Name,
+    //     Zeitung: data.Zeitung
+    // }
+    console.log(formattedData);
     dod3magic(formattedData);
 }
 
 
 //load data
 function dod3magic(d) {
-    dataset.push([Number(d.x), Number(d.y), d.Name, d.Zeitung]);
+    // dataset.push([Number(d.x), Number(d.y), d.Name, d.Zeitung]);
+    dataset = d;
     console.log(dataset)
 
     //var color = d3.scaleOrdinal(d3.schemeCategory20);
