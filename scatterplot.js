@@ -2,30 +2,37 @@
 var w = 600;
 var h = 400;
 var padding = 40;
-
-
-
-
 var dataset = [];
-//load data
-d3.csv('scatterplot.csv', function (d) {
-    //data.forEach(function(d) {
-    //dataset.push(d.precipitation);
 
-    console.log(dataset)
-    return {
-        x: d.x,
-        y: d.y,
-        name: d.Name,
-        zeitung: d.Zeitung
-    };
-}, function (d) {
-    dataset.push([Number(d.x), Number(d.y), d.Name,d.Zeitung]);
+$(function () {
+    fetchAsync("http://127.0.0.1:5002/");
+});
+
+async function fetchAsync(url) {
+    let response = await fetch(url, {
+        mode: 'cors'
+    });
+    let data = await response.json();
+    formattedData = {
+        x: data.aggressive,
+        y: data.positive,
+        Name: data.Name,
+        Zeitung: data.Zeitung
+    }
+    dod3magic(formattedData);
+}
+
+
+//load data
+function dod3magic(d) {
+    dataset.push([Number(d.x), Number(d.y), d.Name, d.Zeitung]);
     console.log(dataset)
 
     //var color = d3.scaleOrdinal(d3.schemeCategory20);
-    var cValue = function(d) { return d.Name;},
-    color = d3.scaleOrdinal(d3.schemeCategory20)
+    var cValue = function (d) {
+            return d.Zeitung;
+        },
+        color = d3.scaleOrdinal(d3.schemeCategory20)
     //scale function
     var xScale = d3.scaleLinear()
         .domain([0, 1])
@@ -88,9 +95,9 @@ d3.csv('scatterplot.csv', function (d) {
         .append("circle")
         .attr("class", "dot")
         .attr("r", 3.5)
-        .attr('fill', function(d, i) { 
-            return color(d[2]);
-          })
+        .attr('fill', function (d, i) {
+            return color(d[3]);
+        })
         .attr("cx", function (d) {
             return xScale(d[0]);
         })
@@ -101,8 +108,8 @@ d3.csv('scatterplot.csv', function (d) {
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html(d[2] + "<br/>"+d[3] + "<br/> (" + d[0]
-                + ", " + d[1] + ")")
+            tooltip.html(d[2] + "<br/>" + d[3] + "<br/> (" + d[0] +
+                    ", " + d[1] + ")")
                 .style("left", (d3.event.pageX + 10) + "px")
                 .style("top", (d3.event.pageY - 40) + "px");
         })
@@ -119,7 +126,9 @@ d3.csv('scatterplot.csv', function (d) {
         .data(color.domain())
         .enter().append("g")
         .attr("class", "legend")
-        .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+        .attr("transform", function (d, i) {
+            return "translate(0," + i * 20 + ")";
+        });
 
     // draw legend colored rectangles
     legend.append("rect")
@@ -134,6 +143,8 @@ d3.csv('scatterplot.csv', function (d) {
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text(function (d) { return d; })
+        .text(function (d) {
+            return d;
+        })
 
-});
+}

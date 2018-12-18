@@ -32,7 +32,7 @@ def getDataFromJson():
         data = json.load(data_file)["results"]
 
         for key in data.keys():
-            data[key] = data[key]["percentile"]
+            data[key] = data[key]["percentile"] / 100.0
 
         data["Name"] = "Bernd Baumann"
         data["Zeitung"] = "Süddeutsche Zeitung"
