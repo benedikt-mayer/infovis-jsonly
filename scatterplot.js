@@ -16,10 +16,11 @@ d3.csv('scatterplot.csv', function (d) {
     return {
         x: d.x,
         y: d.y,
-        name: d.Name
+        name: d.Name,
+        zeitung: d.Zeitung
     };
 }, function (d) {
-    dataset.push([Number(d.x), Number(d.y), d.Name]);
+    dataset.push([Number(d.x), Number(d.y), d.Name,d.Zeitung]);
     console.log(dataset)
 
     //var color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -28,7 +29,7 @@ d3.csv('scatterplot.csv', function (d) {
     //scale function
     var xScale = d3.scaleLinear()
         .domain([0, 1])
-        .range([padding, w - padding * 2]);
+        .range([padding, w - padding]);
 
     var yScale = d3.scaleLinear()
         .domain([0, 1])
@@ -100,7 +101,7 @@ d3.csv('scatterplot.csv', function (d) {
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html(d[2] + "<br/> (" + d[0]
+            tooltip.html(d[2] + "<br/>"+d[3] + "<br/> (" + d[0]
                 + ", " + d[1] + ")")
                 .style("left", (d3.event.pageX + 10) + "px")
                 .style("top", (d3.event.pageY - 40) + "px");

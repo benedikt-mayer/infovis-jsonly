@@ -35,6 +35,11 @@
         <p class="lead">Using a force directed graph to visualize sentinment similarites. The distance between the
           nodes stands for the similarity</p>
       </div>
+      <fieldset>
+        <input type="radio" id="mc" name="Thema" value="Maaßen"> <label for="Ma">Maaßen</label>
+        <input type="radio" id="vi" name="Thema" value="Seehofer"> <label for="Se">Seehofer</label>
+        <input type="radio" id="ae" name="Thema" value="SPD"> <label for="Sp">SPD</label>
+      </fieldset>
       <svg id="force-directed"></svg>
 
       <div class="slidecontainer">
@@ -49,7 +54,16 @@
         <h2 class="display-5">How did newspapers write about...</h2>
         <p class="lead">Using scatterplots we want to visualize different sentiments in newspapers about the same
           topic.</p>
-        <div id="vis-container"></div>
+        <div id="vis-container">
+          <fieldset>
+            <input type="radio" id="mc" name="Thema" value="Maaßen"> <label for="Ma">Maaßen</label>
+            <input type="radio" id="vi" name="Thema" value="Seehofer"> <label for="Se">Seehofer</label>
+            <input type="radio" id="ae" name="Thema" value="SPD"> <label for="Sp">SPD</label>
+          </fieldset>
+          <div class="slidecontainer">
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+          </div>
+        </div>
       </div>
     </div>
   </div>

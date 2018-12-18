@@ -1,4 +1,8 @@
-x,y,Name
-0,0,Iris
-0.2,1,Felix
-0.1,0.4,Bene
+x,y,Name,Zeitung
+0.1,0.1,Andrea Bachstein,SZ
+0.2,0.2,Ronen Steinke,SZ
+0.1,0.4,Markus Balser,SZ
+0.7,0.7,Dyrk Scherff,FAZ
+0.8,0.8,Philip Plickert,FAZ
+0.8,0.1,Michael Kröger,Spiegel
+0.6,0.2,Christiane Hoffmann,Spiegel

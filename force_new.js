@@ -1,31 +1,29 @@
 var baseNodes = [
-  { id: "mammal", group: 0, label: "Mammals", level: 1 },
-  { id: "dog", group: 0, label: "Dogs", level: 2 },
-  { id: "cat", group: 0, label: "Cats", level: 2 },
-  { id: "fox", group: 0, label: "Foxes", level: 2 },
-  { id: "elk", group: 0, label: "Elk", level: 2 },
-  { id: "insect", group: 1, label: "Insects", level: 1 },
-  { id: "ant", group: 1, label: "Ants", level: 2 },
-  { id: "bee", group: 1, label: "Bees", level: 2 },
-  { id: "fish", group: 2, label: "Fish", level: 1 },
-  { id: "carp", group: 2, label: "Carp", level: 2 },
-  { id: "pike", group: 2, label: "Pikes", level: 2 }
+  { id: "Süddeutsche Zeitung", group: 0, label: "Süddeutsche Zeitung", level: 1 },
+  { id: "Andrea Bachstein", group: 0, label: "Andrea Bachstein", level: 2 },
+  { id: "Ronen Steinke", group: 0, label: "Ronen Steinke", level: 2 },
+  { id: "Markus Balser", group: 0, label: "Markus Balser", level: 2 },
+  { id: "Larissa Holziki", group: 0, label: "Larissa Holziki", level: 2 },
+  { id: "Frankfurter Allgemeine", group: 1, label: "Frankfurter Allgemeine", level: 1 },
+  { id: "Dyrk Scherff", group: 1, label: "Dyrk Scherff", level: 2 },
+  { id: "Philip Plickert", group: 1, label: "Philip Plickert", level: 2 },
+  { id: "Spiegel", group: 2, label: "Spiegel", level: 1 },
+  { id: "Michael Kröger", group: 2, label: "Michael Kröger", level: 2 },
+  { id: "Christiane Hoffmann", group: 2, label: "Christiane Hoffmann", level: 2 }
 ]
 var baseLinks = [
-  { target: "mammal", source: "dog", strength: 0.7 },
-  { target: "mammal", source: "cat", strength: 0.7 },
-  { target: "mammal", source: "fox", strength: 0.7 },
-  { target: "mammal", source: "elk", strength: 0.7 },
-  { target: "insect", source: "ant", strength: 0.7 },
-  { target: "insect", source: "bee", strength: 0.7 },
-  { target: "fish", source: "carp", strength: 0.7 },
-  { target: "fish", source: "pike", strength: 0.7 },
-  { target: "cat", source: "elk", strength: 0.1 },
-  { target: "carp", source: "ant", strength: 0.1 },
-  { target: "elk", source: "bee", strength: 0.1 },
-  { target: "dog", source: "cat", strength: 0.1 },
-  { target: "fox", source: "ant", strength: 0.1 },
-  { target: "pike", source: "cat", strength: 0.1 }
+  { target: "Süddeutsche Zeitung", source: "Andrea Bachstein", strength: 0.9 },
+  { target: "Süddeutsche Zeitung", source: "Ronen Steinke", strength: 0.9 },
+  { target: "Süddeutsche Zeitung", source: "Markus Balser", strength: 0.9 },
+  { target: "Süddeutsche Zeitung", source: "Larissa Holziki", strength: 0.9 },
+  { target: "Frankfurter Allgemeine", source: "Dyrk Scherff", strength: 0.8 },
+  { target: "Frankfurter Allgemeine", source: "Philip Plickert", strength: 0.8 },
+  { target: "Spiegel", source: "Michael Kröger", strength: 0.7 },
+  { target: "Spiegel", source: "Christiane Hoffmann", strength: 0.7 },
+  { target: "Spiegel", source: "Süddeutsche Zeitung", strength: 0.4 },
+  { target: "Spiegel", source: "Frankfurter Allgemeine", strength: 0.1 },
+  { target: "Süddeutsche Zeitung", source: "Frankfurter Allgemeine", strength: 0.1 },
+
 ]
 var nodes = [...baseNodes]
 var links = [...baseLinks]
@@ -78,7 +76,7 @@ var linkForce = d3
 var simulation = d3
   .forceSimulation()
   .force('link', linkForce)
-  .force('charge', d3.forceManyBody().strength(-120))
+  .force('charge', d3.forceManyBody().strength(-300))
   .force('center', d3.forceCenter(width / 2, height / 2))
 var dragDrop = d3.drag().on('start', function (node) {
   node.fx = node.x
