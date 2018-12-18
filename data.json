@@ -1,0 +1,34 @@
+{
+    "results": {
+        "aggressive": {
+            "percentile": 43
+        },
+        "composed": {
+            "percentile": 30
+        },
+        "goal_oriented": {
+            "percentile": 49
+        },
+        "motivating": {
+            "percentile": 31
+        },
+        "optimistic": {
+            "percentile": 38
+        },
+        "positive": {
+            "percentile": 33
+        },
+        "reliable": {
+            "percentile": 73
+        },
+        "self_confident": {
+            "percentile": 61
+        },
+        "supportive": {
+            "percentile": 45
+        },
+        "visionary": {
+            "percentile": 41
+        }
+    }
+}
