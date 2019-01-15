@@ -4,22 +4,39 @@ var h = 400;
 var padding = 40;
 var dataset = [];
 
+const SPD = "SPD"
+const AfD = "SPD"
+const CDU = "SPD"
+
 $(function () {
-    fetchAsync("http://127.0.0.1:5002/");
+    let checkvalue = $('input[type=radio][name=Scatter]:checked').val()
+    console.log(checkvalue)
+    fetchAsync(`http://127.0.0.1:5002/${checkvalue}`);
+});
+
+$('input[type=radio][name=Scatter]').on('change', function() {
+    console.log($(this).val())
+    fetchAsync(`http://127.0.0.1:5002/${$(this).val()}`);
 });
 
 async function fetchAsync(url) {
     let response = await fetch(url, {
+        headers: {
+            'Content-type': 'charset=UTF-8'
+        },
         mode: 'cors'
     });
+    // let text = await response.text();
     let data = await response.json();
     console.log(data);
-    formattedData = Object.values(data).map(element => {
+    formattedData = data.map(element => {
         return [
-            element.aggressive,
-            element.positive,
-            element.Name,
-            element.Zeitung
+            element.results.aggressive.percentile / 100,
+            element.results.positive.percentile / 100,
+            element.author,
+            element.newsportal,
+            element.title,
+            element.date
         ]
     })
     // formattedData = {
@@ -28,22 +45,22 @@ async function fetchAsync(url) {
     //     Name: data.Name,
     //     Zeitung: data.Zeitung
     // }
-    console.log(formattedData);
+    // console.log(formattedData);
     dod3magic(formattedData);
 }
 
 
 //load data
-function dod3magic(d) {
+function dod3magic(data) {
     // dataset.push([Number(d.x), Number(d.y), d.Name, d.Zeitung]);
-    dataset = d;
+    dataset = data;
     console.log(dataset)
 
     //var color = d3.scaleOrdinal(d3.schemeCategory20);
     var cValue = function (d) {
             return d.Zeitung;
         },
-        color = d3.scaleOrdinal(d3.schemeCategory20)
+        color = d3.scaleOrdinal(d3.schemeCategory10).range(d3.schemeCategory10);
     //scale function
     var xScale = d3.scaleLinear()
         .domain([0, 1])
@@ -52,6 +69,15 @@ function dod3magic(d) {
     var yScale = d3.scaleLinear()
         .domain([0, 1])
         .range([h - padding, padding]);
+
+    var margin = {
+            top: 20,
+            right: 20,
+            bottom: 50,
+            left: 70
+        },
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
 
     var xAxis = d3.axisBottom().scale(xScale).ticks(5);
 
@@ -73,8 +99,9 @@ function dod3magic(d) {
             .append("text")
             .attr("class", "label")
             .attr("x", w)
-            .attr("y", -6)
+            .attr("y", 30)
             .style("text-anchor", "end")
+            .style("fill", "black")
             .text("Aggressiveness");
 
         //y axis
@@ -83,11 +110,13 @@ function dod3magic(d) {
             .attr("transform", "translate(" + padding + ", 0)")
             .call(yAxis)
             .append("text")
+            .style("text-anchor", "middle")
             .attr("class", "label")
-            .attr("y", 6)
-            .attr("x", 30)
+            .attr("y", 20)
+            .attr("x", 20)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
+            .style("fill", "black")
             .text("Friendliness");
 
     } else {
@@ -98,6 +127,7 @@ function dod3magic(d) {
         .attr("class", "tooltip")
         .style("opacity", 0);
 
+    console.log("color domain before: " + color.domain())
 
     // draw dots
     svg.selectAll(".dot")
@@ -118,11 +148,16 @@ function dod3magic(d) {
         .on("mouseover", function (d) {
             tooltip.transition()
                 .duration(200)
-                .style("opacity", .9);
-            tooltip.html(d[2] + "<br/>" + d[3] + "<br/> (" + d[0] +
+                .style("opacity", 1);
+            tooltip.html(d[2] + "<br/>" + d[3] + "<br/>" + d[4] + "<br/>" + d[5] + "<br/> (" + d[0] +
                     ", " + d[1] + ")")
-                .style("left", (d3.event.pageX + 10) + "px")
-                .style("top", (d3.event.pageY - 40) + "px");
+                .style("left", (d3.event.pageX + 20) + "px")
+                .style("top", (d3.event.pageY - 200) + "px")
+                .style("border", "1px solid black")
+                .style("border-radius", "4px")
+                .style("padding", "0.8rem")
+                .style("height", "fit-content")
+                .style("background-color", "white");
         })
         .on("mouseout", function (d) {
             tooltip.transition()
@@ -130,7 +165,7 @@ function dod3magic(d) {
                 .style("opacity", 0);
         });
 
-
+    console.log("color domain" + color.domain())
 
     // draw legend
     var legend = svg.selectAll(".legend")
