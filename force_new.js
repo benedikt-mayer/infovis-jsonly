@@ -1,160 +1,43 @@
-var baseNodes = [{
-    id: "Süddeutsche Zeitung",
-    group: 0,
-    label: "Süddeutsche Zeitung",
-    level: 1
-  },
-  {
-    id: "Andrea Bachstein",
-    group: 0,
-    label: "Andrea Bachstein",
-    level: 2
-  },
-  {
-    id: "Ronen Steinke",
-    group: 0,
-    label: "Ronen Steinke",
-    level: 2
-  },
-  {
-    id: "Markus Balser",
-    group: 0,
-    label: "Markus Balser",
-    level: 2
-  },
-  {
-    id: "Larissa Holziki",
-    group: 0,
-    label: "Larissa Holziki",
-    level: 2
-  },
-  {
-    id: "Frankfurter Allgemeine",
-    group: 1,
-    label: "Frankfurter Allgemeine",
-    level: 1
-  },
-  {
-    id: "Dyrk Scherff",
-    group: 1,
-    label: "Dyrk Scherff",
-    level: 2
-  },
-  {
-    id: "Philip Plickert",
-    group: 1,
-    label: "Philip Plickert",
-    level: 2
-  },
-  {
-    id: "Spiegel",
-    group: 2,
-    label: "Spiegel",
-    level: 1
-  },
-  {
-    id: "Michael Kröger",
-    group: 2,
-    label: "Michael Kröger",
-    level: 2
-  },
-  {
-    id: "Christiane Hoffmann",
-    group: 2,
-    label: "Christiane Hoffmann",
-    level: 2
-  }
-]
-var baseLinks = [{
-    target: "Süddeutsche Zeitung",
-    source: "Andrea Bachstein",
-    strength: 0.9
-  },
-  {
-    target: "Süddeutsche Zeitung",
-    source: "Ronen Steinke",
-    strength: 0.9
-  },
-  {
-    target: "Süddeutsche Zeitung",
-    source: "Markus Balser",
-    strength: 0.9
-  },
-  {
-    target: "Süddeutsche Zeitung",
-    source: "Larissa Holziki",
-    strength: 0.9
-  },
-  {
-    target: "Frankfurter Allgemeine",
-    source: "Dyrk Scherff",
-    strength: 0.8
-  },
-  {
-    target: "Frankfurter Allgemeine",
-    source: "Philip Plickert",
-    strength: 0.8
-  },
-  {
-    target: "Spiegel",
-    source: "Michael Kröger",
-    strength: 0.7
-  },
-  {
-    target: "Spiegel",
-    source: "Christiane Hoffmann",
-    strength: 0.7
-  },
-  {
-    target: "Spiegel",
-    source: "Süddeutsche Zeitung",
-    strength: 0.4
-  },
-  {
-    target: "Spiegel",
-    source: "Frankfurter Allgemeine",
-    strength: 0.1
-  },
-  {
-    target: "Süddeutsche Zeitung",
-    source: "Frankfurter Allgemeine",
-    strength: 0.1
-  },
+var baseNodes = []
+var baseLinks = []
 
-]
-
-
+// check which radio button is selected on page start and fetch the data accordingly
 $(function () {
   let checkvalue = $('input[type=radio][name=Thema]:checked').val()
   console.log("initial force new: " + checkvalue)
   fetchAsyncForce(`http://127.0.0.1:5002/${checkvalue}`);
 });
 
+// check which radio button is selected currently / changed and fetch the data accordingly
 $('input[type=radio][name=Thema]').on('change', function () {
   console.log("changed in force new: " + $(this).val())
   fetchAsyncForce(`http://127.0.0.1:5002/${$(this).val()}`);
 });
 
-var jiggle = -20
+// constants for the graph gravity
+const force_many_body = -1000
+const strength_scaling = 10
 
+// fetch the data from the server and then call the d3 function to display the data
 async function fetchAsyncForce(url) {
   console.log("fetching force new")
-  // $("#vis-container").find("circle").remove()
+  // fetch the data from the server
   let response = await fetch(url, {
     headers: {
       'Content-type': 'charset=UTF-8'
     },
     mode: 'cors'
   });
-  // let text = await response.text();
   let data = await response.json();
   // console.log("data");
   // console.log(data);
+
+  // group the data according to the newspaper
   let newspaper_lists = data.reduce((newspaper_aggregated, element) => {
     if (!newspaper_aggregated[element.newsportal]) {
       newspaper_aggregated[element.newsportal] = [];
     }
-    if (!Object.values(newspaper_aggregated).some(newspaper_collection => newspaper_collection.some(existing_element => existing_element.title == element.title))){
+    if (!Object.values(newspaper_aggregated).some(newspaper_collection => newspaper_collection.some(existing_element => existing_element.title == element.title))) {
       newspaper_aggregated[element.newsportal].push({
         results: element.results,
         title: element.title,
@@ -164,16 +47,15 @@ async function fetchAsyncForce(url) {
     return newspaper_aggregated;
   }, {});
 
-
-  
+  // now take only the first 15 entries per newspaper
   Object.entries(newspaper_lists).forEach(([newspaper_list_key, newspaper_list_value]) =>
-  newspaper_lists[newspaper_list_key] = newspaper_list_value.slice(0, 15)
+    newspaper_lists[newspaper_list_key] = newspaper_list_value.slice(0, 15)
   )
 
-  console.log("newspaper_lists")
-  console.log(newspaper_lists)
+  // console.log("newspaper_lists")
+  // console.log(newspaper_lists)
 
-
+  // sum up the data per newspaper
   let summed_newspaper_data = Object.keys(newspaper_lists).map(newsportal => {
     return [
       newsportal, newspaper_lists[newsportal].reduce((sum, element, resultsIndex) => {
@@ -192,77 +74,98 @@ async function fetchAsyncForce(url) {
   // console.log("summed_newspaper_data")
   // console.log(summed_newspaper_data)
 
+  // create the newspaper_links according to the summed_newspaper_data
   let newspaper_links = []
   summed_newspaper_data.forEach(source_newspaper_array => {
     let source_newspaper_name = source_newspaper_array[0]
     let source_newspaper_values = source_newspaper_array[1]
+
     summed_newspaper_data.forEach(target_newspaper_array => {
       let target_newspaper_name = target_newspaper_array[0]
       let target_newspaper_values = target_newspaper_array[1]
+
       if (source_newspaper_name != target_newspaper_name) {
+
         let distances = Object.keys(source_newspaper_values).map(result_key => {
-          return source_newspaper_values[result_key] - target_newspaper_values[result_key]
+          return Math.abs(source_newspaper_values[result_key] - target_newspaper_values[result_key])
         })
+
         let strength_value = Math.hypot(distances[0], distances[1], distances[2], distances[3], distances[4], distances[5], distances[6], distances[7], distances[8], distances[9])
+
         newspaper_links.push({
           target: target_newspaper_name,
           source: source_newspaper_name,
-          strength: strength_value / 100
+          strength: 1 - strength_value
         })
       }
 
     })
   })
 
+  // get the maximum and minimum strength values for normalization
+  let strength_max = newspaper_links.reduce((max, value) => {
+    if (value.strength > max) {
+      return value.strength
+    } else {
+      return max
+    }
+  }, 0.0)
+  let strength_min = newspaper_links.reduce((min, value) => {
+    if (value.strength < min) {
+      return value.strength
+    } else {
+      return min
+    }
+  }, 1.0)
+
+  // now normalize the data
+  newspaper_links = newspaper_links.map(element => {
+    return {
+      target: element.target,
+      source: element.source,
+      strength: ((element.strength - strength_min) / (strength_max - strength_min)) / strength_scaling
+    }
+  })
+  console.log("strength max: " + strength_max)
+  console.log("strength min: " + strength_min)
+
+  // if we want to use the individual articles, merge them into one list
   let filtered_articles = Object.keys(newspaper_lists).reduce((accumulator, newspaper_key) => {
     return [...accumulator, ...newspaper_lists[newspaper_key]]
   }, [])
 
   // console.log("filtered_articles")
   // console.log(filtered_articles)
-  
-  newspaper_links = [...newspaper_links, ...filtered_articles.map(article => {
-    return {
-      target: article.newsportal,
-      source: article.title,
-      strength: 1.0
-    };
-  })]
-  // console.log("newspaper_links")
-  // console.log(newspaper_links)
+
+  console.log("newspaper_links")
+  console.log(newspaper_links)
+  // get all individual newsportals
   let newspapers = Object.keys(newspaper_lists)
-  console.log("newspapers")
-  console.log(newspapers)
+  // console.log("newspapers")
+  // console.log(newspapers)
 
-
-  let newspaper_base_nodes = filtered_articles.map(element => {
-    return {
-      id: element.title,
-      group: newspapers.indexOf(element.newsportal),
-      label: "", 
-      level: 2
-    }
-  })
+  // now construct the base nodes from the newsportals
+  newspaper_base_nodes = []
   newspapers.forEach(newspaper => {
     newspaper_base_nodes.push({
       id: newspaper,
       group: newspapers.indexOf(newspaper),
       label: newspaper,
-      level: 1
+      level: 1,
+      results: summed_newspaper_data.find(newspaper_element => newspaper_element[0] == newspaper)[1]
     })
   })
-  // console.log("newspaper_base_nodes")
-  // console.log(newspaper_base_nodes)
+  console.log("newspaper_base_nodes")
+  console.log(newspaper_base_nodes)
+  // set the baseNodes and nodes
   baseNodes = newspaper_base_nodes;
   baseLinks = newspaper_links;
   nodes = [...baseNodes]
   links = [...baseLinks]
+  // now call the d3 function
   updateSimulation()
 }
 
-
-// var nodes = [...baseNodes]
-// var links = [...baseLinks]
 
 function getNeighbors(node) {
   return baseLinks.reduce(function (neighbors, link) {
@@ -293,15 +196,21 @@ function getLinkColor(node, link) {
 }
 
 function getTextColor(node, neighbors) {
-  return Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1 ? 'green' : 'black'
+  return 'black'
 }
 var width = window.innerWidth * 0.9
 var height = window.innerHeight * 0.9
 var svg = d3.select('#force-directed')
-svg.attr('width', width).attr('height', height)//.call(zoom)//.call(zoom.transform, d3.zoomIdentity.translate(100,50).scale(0.5))
+svg.attr('width', width).attr('height', height)
 var linkElements,
   nodeElements,
   textElements
+
+// add the tooltip area to the webpage
+var tooltip = d3.select("body").append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
 // we use svg groups to logically group the elements together
 var linkGroup = svg.append('g').attr('class', 'links')
 var nodeGroup = svg.append('g').attr('class', 'nodes')
@@ -321,7 +230,7 @@ var linkForce = d3
 var simulation = d3
   .forceSimulation()
   .force('link', linkForce)
-  .force('charge', d3.forceManyBody().strength(jiggle))
+  .force('charge', d3.forceManyBody().strength(force_many_body))
   .force('center', d3.forceCenter(width / 2, height / 2))
 var dragDrop = d3.drag().on('start', function (node) {
   node.fx = node.x
@@ -409,7 +318,7 @@ function updateGraph() {
   linkElements.exit().remove()
   var linkEnter = linkElements
     .enter().append('line')
-    .attr('stroke-width', 1)
+    .attr('stroke-width', 2)
     .attr('stroke', 'rgba(50, 50, 50, 0.2)')
   linkElements = linkEnter.merge(linkElements)
   // nodes
@@ -421,14 +330,32 @@ function updateGraph() {
   var nodeEnter = nodeElements
     .enter()
     .append('circle')
-    .attr('r', 10)
+    .attr('r', 15)
     .attr('fill', function (node) {
-      return node.level === 1 ? 'red' : 'gray'
+      return node.level === 1 ? 'blue' : 'gray'
     })
     .call(dragDrop)
     // we link the selectNode method here
     // to update the graph on every click
     .on('click', selectNode)
+  .on("mouseover", function (node) {
+    tooltip.transition()
+      .duration(200)
+      .style("opacity", 1);
+    tooltip.html("<b>Newsportal:</b> " + node.id + "<br><br>" + Object.keys(node.results).map(result_key => "<b>" + result_key + "</b>: " + node.results[result_key].toString().substr(0, 5) + "<br>").reduce((acc, value) => acc + value))
+      .style("left", (d3.event.pageX + 60) + "px")
+      .style("top", (d3.event.pageY - 200) + "px")
+      .style("border", "1px solid black")
+      .style("border-radius", "4px")
+      .style("padding", "0.8rem")
+      .style("height", "fit-content")
+      .style("background-color", "white");
+  })
+  .on("mouseout", function (d) {
+    tooltip.transition()
+      .duration(500)
+      .style("opacity", 0);
+  });
   nodeElements = nodeEnter.merge(nodeElements)
   // texts
   textElements = textGroup.selectAll('text')
@@ -443,7 +370,7 @@ function updateGraph() {
       return node.label
     })
     .attr('font-size', 15)
-    .attr('dx', 15)
+    .attr('dx', 20)
     .attr('dy', 4)
   textElements = textEnter.merge(textElements)
 }
@@ -454,50 +381,34 @@ function updateSimulation() {
 
   let radius = 6;
   updateGraph()
-  simulation.nodes(nodes).on('tick', () => 
-  {
-    nodeElements.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
-        .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
-    textElements.attr("x", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
-        .attr("y", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
+  simulation.nodes(nodes).on('tick', () => {
+      nodeElements.attr("cx", function (d) {
+          return d.x = Math.max(radius, Math.min(width - radius, d.x));
+        })
+        .attr("cy", function (d) {
+          return d.y = Math.max(radius, Math.min(height - radius, d.y));
+        });
+      textElements.attr("x", function (d) {
+          return d.x = Math.max(radius, Math.min(width - radius, d.x));
+        })
+        .attr("y", function (d) {
+          return d.y = Math.max(radius, Math.min(height - radius, d.y));
+        });
 
-    linkElements.attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
-  }
-  /* {
-    nodeElements
-      .attr('cx', function (node) {
-        return node.x
-      })
-      .attr('cy', function (node) {
-        return node.y
-      })
-    textElements
-      .attr('x', function (node) {
-        return node.x
-      })
-      .attr('y', function (node) {
-        return node.y
-      })
-    linkElements
-      .attr('x1', function (link) {
-        return link.source.x
-      })
-      .attr('y1', function (link) {
-        return link.source.y
-      })
-      .attr('x2', function (link) {
-        return link.target.x
-      })
-      .attr('y2', function (link) {
-        return link.target.y
-      })
-  } */
+      linkElements.attr("x1", function (d) {
+          return d.source.x;
+        })
+        .attr("y1", function (d) {
+          return d.source.y;
+        })
+        .attr("x2", function (d) {
+          return d.target.x;
+        })
+        .attr("y2", function (d) {
+          return d.target.y;
+        });
+    }
   )
   simulation.force('link').links(links)
   simulation.alphaTarget(0.7).restart()
 }
-// last but not least, we call updateSimulation
-// to trigger the initial render

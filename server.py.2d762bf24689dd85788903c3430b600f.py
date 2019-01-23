@@ -86,8 +86,8 @@ def getArticles(topic):
                      "AND newsportal NOT LIKE '%Donaukurier%' "
                      "AND newsportal NOT LIKE '%Russia Today%' "
                      "AND url NOT LIKE '%bild-international/%' "
-                     "AND ((doc.description like '%" + topic +
-                     "%') OR (doc.description like '%" + topic_alias + "%')) "
+                     "AND ((description like '%" + topic +
+                     "%') OR (description like '%" + topic_alias + "%')) "
                      "GROUP BY doc_keyword.document_id "
                      "ORDER BY doc.id "
                      "LIMIT 0 , 1000000")
@@ -104,8 +104,8 @@ def getArticles(topic):
              "AND newsportal not like '%Donaukurier%' "
              "AND newsportal not like '%Russia Today%' "
              "AND url not like '%bild-international/%' "
-             "AND ((doc.description like '%" + topic +
-             "%') OR (doc.description like '%" + topic_alias + "%')) "
+             "AND (( description like '%" + topic +
+             "%') OR (description like '%" + topic_alias + "%')) "
              "LIMIT 0, 10000000")
     # fetch the article text data
     cursor.execute(query)
@@ -123,7 +123,7 @@ def getArticles(topic):
     for keyword_item in keyword_data:
         current_id = keyword_item[0]
         current_keywords = keyword_item[1]
-        if ((topic in current_keywords) or (topic_alias in current_keywords)):
+        if (topic in current_keywords):
             keyword_document_ids.append(current_id)
     print(keyword_document_ids)
 

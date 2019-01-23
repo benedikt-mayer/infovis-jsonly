@@ -1,36 +1,37 @@
 //width and height
-var w = 600;
-var h = 400;
-var padding = 40;
-var dataset = [];
+const w = 600;
+const h = 400;
+const padding = 40;
+let dataset = [];
 
-const SPD = "SPD"
-const AfD = "SPD"
-const CDU = "SPD"
-
+// check which radio button is selected on page start and fetch the data accordingly
 $(function () {
     let checkvalue = $('input[type=radio][name=Scatter]:checked').val()
     console.log("initial scatter: " + checkvalue)
     fetchAsyncScatter(`http://127.0.0.1:5002/${checkvalue}`);
 });
 
-$('input[type=radio][name=Scatter]').on('change', function() {
+// check which radio button is selected currently / changed and fetch the data accordingly
+$('input[type=radio][name=Scatter]').on('change', function () {
     console.log("changed in scatter: " + $(this).val())
     fetchAsyncScatter(`http://127.0.0.1:5002/${$(this).val()}`);
 });
 
+// fetch the data from the server and then call the d3 function to display the data
 async function fetchAsyncScatter(url) {
     console.log("async scatter")
+    // remove all old circles
     $("#vis-container").find("circle").remove()
+    // fetch the data from the server
     let response = await fetch(url, {
         headers: {
             'Content-type': 'charset=UTF-8'
         },
         mode: 'cors'
     });
-    // let text = await response.text();
     let data = await response.json();
     console.log(data);
+    // format the data and only get what we need for the visualization
     formattedData = data.map(element => {
         return [
             element.results.aggressive.percentile / 100,
@@ -41,12 +42,6 @@ async function fetchAsyncScatter(url) {
             element.date
         ]
     })
-    // formattedData = {
-    //     x: data.aggressive,
-    //     y: data.positive,
-    //     Name: data.Name,
-    //     Zeitung: data.Zeitung
-    // }
     // console.log(formattedData);
     dod3magic(formattedData);
 }
@@ -54,15 +49,10 @@ async function fetchAsyncScatter(url) {
 
 //load data
 function dod3magic(data) {
-    // dataset.push([Number(d.x), Number(d.y), d.Name, d.Zeitung]);
     dataset = data;
     console.log(dataset)
 
-    //var color = d3.scaleOrdinal(d3.schemeCategory20);
-    var cValue = function (d) {
-            return d.Zeitung;
-        },
-        color = d3.scaleOrdinal(d3.schemeCategory10).range(d3.schemeCategory10);
+    var color = d3.scaleOrdinal(d3.schemeCategory10).range(d3.schemeCategory10);
     //scale function
     var xScale = d3.scaleLinear()
         .domain([0, 1])
@@ -72,14 +62,7 @@ function dod3magic(data) {
         .domain([0, 1])
         .range([h - padding, padding]);
 
-    var margin = {
-            top: 20,
-            right: 20,
-            bottom: 50,
-            left: 70
-        },
-        width = 960 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+
 
     var xAxis = d3.axisBottom().scale(xScale).ticks(5);
 
@@ -151,14 +134,15 @@ function dod3magic(data) {
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 1);
-            tooltip.html(d[2] + "<br/>" + d[3] + "<br/>" + d[4] + "<br/>" + d[5] + "<br/> (" + d[0] +
-                    ", " + d[1] + ")")
+            tooltip.html("<b>Author:</b> " + d[2] + "<br/>" + "<b>Newsportal:</b> " + d[3] + "<br/>" + "<b>Title:</b> " + d[4] + "<br/>" + "<b>Date:</b> " + d[5] + "<br/>" + "<b>Aggressiveness:</b> " + d[0] + "<br/>" +
+                    "<b>Friendliness:</b> " + d[1])
                 .style("left", (d3.event.pageX + 20) + "px")
                 .style("top", (d3.event.pageY - 200) + "px")
                 .style("border", "1px solid black")
                 .style("border-radius", "4px")
                 .style("padding", "0.8rem")
                 .style("height", "fit-content")
+                .style("width", "300px")
                 .style("background-color", "white");
         })
         .on("mouseout", function (d) {
