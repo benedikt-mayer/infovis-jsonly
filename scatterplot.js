@@ -10,16 +10,18 @@ const CDU = "SPD"
 
 $(function () {
     let checkvalue = $('input[type=radio][name=Scatter]:checked').val()
-    console.log(checkvalue)
-    fetchAsync(`http://127.0.0.1:5002/${checkvalue}`);
+    console.log("initial scatter: " + checkvalue)
+    fetchAsyncScatter(`http://127.0.0.1:5002/${checkvalue}`);
 });
 
 $('input[type=radio][name=Scatter]').on('change', function() {
-    console.log($(this).val())
-    fetchAsync(`http://127.0.0.1:5002/${$(this).val()}`);
+    console.log("changed in scatter: " + $(this).val())
+    fetchAsyncScatter(`http://127.0.0.1:5002/${$(this).val()}`);
 });
 
-async function fetchAsync(url) {
+async function fetchAsyncScatter(url) {
+    console.log("async scatter")
+    $("#vis-container").find("circle").remove()
     let response = await fetch(url, {
         headers: {
             'Content-type': 'charset=UTF-8'

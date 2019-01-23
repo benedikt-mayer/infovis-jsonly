@@ -85,6 +85,8 @@ def getArticles(topic):
              "AND date not like '-' "
              "AND newsportal not like '%Guardian%'"
              "AND newsportal not like '%New York Times%'"
+             "AND newsportal not like '%Donaukurier%'"
+             "AND newsportal not like '%Russia Today%'"
              "AND url not like '%bild-international/%'"
              "AND description like '%" + topic + "%'"
              "LIMIT 0, 1000000")
