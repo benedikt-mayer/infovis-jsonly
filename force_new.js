@@ -5,13 +5,13 @@ var baseLinks = []
 $(function () {
   let checkvalue = $('input[type=radio][name=Thema]:checked').val()
   console.log("initial force new: " + checkvalue)
-  fetchAsyncForce(`http://127.0.0.1:5002/${checkvalue}`);
+  fetchAsyncForce(`${checkvalue}`);
 });
 
 // check which radio button is selected currently / changed and fetch the data accordingly
 $('input[type=radio][name=Thema]').on('change', function () {
   console.log("changed in force new: " + $(this).val())
-  fetchAsyncForce(`http://127.0.0.1:5002/${$(this).val()}`);
+  fetchAsyncForce(`${$(this).val()}`);
 });
 
 // constants for the graph gravity
@@ -22,15 +22,16 @@ const strength_scaling = 10
 async function fetchAsyncForce(url) {
   console.log("fetching force new")
   // fetch the data from the server
-  let response = await fetch(url, {
-    headers: {
-      'Content-type': 'charset=UTF-8'
-    },
-    mode: 'cors'
-  });
-  let data = await response.json();
+  // let response = await fetch(url, {
+  //   headers: {
+  //     'Content-type': 'charset=UTF-8'
+  //   },
+  //   mode: 'cors'
+  // });
+  // let data = await response.json();
   // console.log("data");
   // console.log(data);
+  data = jsonData[url];
 
   // group the data according to the newspaper
   let newspaper_lists = data.reduce((newspaper_aggregated, element) => {

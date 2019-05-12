@@ -7,30 +7,30 @@ let dataset = [];
 // check which radio button is selected on page start and fetch the data accordingly
 $(function () {
     let checkvalue = $('input[type=radio][name=Scatter]:checked').val()
-    console.log("initial scatter: " + checkvalue)
-    fetchAsyncScatter(`http://127.0.0.1:5002/${checkvalue}`);
+    // console.log("initial scatter: " + checkvalue)
+    fetchAsyncScatter(`${checkvalue}`);
 });
 
 // check which radio button is selected currently / changed and fetch the data accordingly
 $('input[type=radio][name=Scatter]').on('change', function () {
-    console.log("changed in scatter: " + $(this).val())
-    fetchAsyncScatter(`http://127.0.0.1:5002/${$(this).val()}`);
+    // console.log("changed in scatter: " + $(this).val())
+    fetchAsyncScatter(`${$(this).val()}`);
 });
 
 // fetch the data from the server and then call the d3 function to display the data
 async function fetchAsyncScatter(url) {
-    console.log("async scatter")
     // remove all old circles
     $("#vis-container").find("circle").remove()
-    // fetch the data from the server
-    let response = await fetch(url, {
-        headers: {
-            'Content-type': 'charset=UTF-8'
-        },
-        mode: 'cors'
-    });
-    let data = await response.json();
-    console.log(data);
+    // // fetch the data from the server
+    // let response = await fetch(url, {
+    //     headers: {
+    //         'Content-type': 'charset=UTF-8'
+    //     },
+    //     mode: 'cors'
+    // });
+    // let data = await response.json();
+    data = jsonData[url];
+    // console.log(data);
     // format the data and only get what we need for the visualization
     formattedData = data.map(element => {
         return [
@@ -50,7 +50,7 @@ async function fetchAsyncScatter(url) {
 //load data
 function dod3magic(data) {
     dataset = data;
-    console.log(dataset)
+    // console.log(dataset)
 
     var color = d3.scaleOrdinal(d3.schemeCategory10).range(d3.schemeCategory10);
     //scale function
