@@ -1,6 +1,6 @@
 //width and height
-const w = 600;
-const h = 400;
+const w = $("#vis-container").parent().width()
+const h = 400
 const padding = 40;
 let dataset = [];
 
@@ -112,8 +112,6 @@ function dod3magic(data) {
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    console.log("color domain before: " + color.domain())
-
     // draw dots
     svg.selectAll(".dot")
         .data(dataset)
@@ -150,8 +148,6 @@ function dod3magic(data) {
                 .duration(500)
                 .style("opacity", 0);
         });
-
-    console.log("color domain" + color.domain())
 
     // draw legend
     var legend = svg.selectAll(".legend")

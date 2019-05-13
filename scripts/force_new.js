@@ -3,14 +3,12 @@ var baseLinks = []
 
 // check which radio button is selected on page start and fetch the data accordingly
 $(function () {
-  let checkvalue = $('input[type=radio][name=Thema]:checked').val()
-  console.log("initial force new: " + checkvalue)
+  let checkvalue = $('input[type=radio][name=Force]:checked').val()
   fetchAsyncForce(`${checkvalue}`);
 });
 
 // check which radio button is selected currently / changed and fetch the data accordingly
-$('input[type=radio][name=Thema]').on('change', function () {
-  console.log("changed in force new: " + $(this).val())
+$('input[type=radio][name=Force]').on('change', function () {
   fetchAsyncForce(`${$(this).val()}`);
 });
 
@@ -20,18 +18,10 @@ const strength_scaling = 10
 
 // fetch the data from the server and then call the d3 function to display the data
 async function fetchAsyncForce(url) {
-  console.log("fetching force new")
-  // fetch the data from the server
-  // let response = await fetch(url, {
-  //   headers: {
-  //     'Content-type': 'charset=UTF-8'
-  //   },
-  //   mode: 'cors'
-  // });
-  // let data = await response.json();
-  // console.log("data");
-  // console.log(data);
   data = jsonData[url];
+
+  width = $("#force-directed").parent().width()
+  height = width / 2;
 
   // group the data according to the newspaper
   let newspaper_lists = data.reduce((newspaper_aggregated, element) => {
@@ -53,9 +43,6 @@ async function fetchAsyncForce(url) {
     newspaper_lists[newspaper_list_key] = newspaper_list_value.slice(0, 15)
   )
 
-  // console.log("newspaper_lists")
-  // console.log(newspaper_lists)
-
   // sum up the data per newspaper
   let summed_newspaper_data = Object.keys(newspaper_lists).map(newsportal => {
     return [
@@ -72,8 +59,6 @@ async function fetchAsyncForce(url) {
       }, {})
     ]
   })
-  // console.log("summed_newspaper_data")
-  // console.log(summed_newspaper_data)
 
   // create the newspaper_links according to the summed_newspaper_data
   let newspaper_links = []
@@ -127,23 +112,14 @@ async function fetchAsyncForce(url) {
       strength: ((element.strength - strength_min) / (strength_max - strength_min)) / strength_scaling
     }
   })
-  console.log("strength max: " + strength_max)
-  console.log("strength min: " + strength_min)
 
   // if we want to use the individual articles, merge them into one list
   let filtered_articles = Object.keys(newspaper_lists).reduce((accumulator, newspaper_key) => {
     return [...accumulator, ...newspaper_lists[newspaper_key]]
   }, [])
 
-  // console.log("filtered_articles")
-  // console.log(filtered_articles)
-
-  console.log("newspaper_links")
-  console.log(newspaper_links)
   // get all individual newsportals
   let newspapers = Object.keys(newspaper_lists)
-  // console.log("newspapers")
-  // console.log(newspapers)
 
   // now construct the base nodes from the newsportals
   newspaper_base_nodes = []
@@ -156,8 +132,6 @@ async function fetchAsyncForce(url) {
       results: summed_newspaper_data.find(newspaper_element => newspaper_element[0] == newspaper)[1]
     })
   })
-  console.log("newspaper_base_nodes")
-  console.log(newspaper_base_nodes)
   // set the baseNodes and nodes
   baseNodes = newspaper_base_nodes;
   baseLinks = newspaper_links;
@@ -199,9 +173,11 @@ function getLinkColor(node, link) {
 function getTextColor(node, neighbors) {
   return 'black'
 }
-var width = window.innerWidth * 0.9
-var height = window.innerHeight * 0.9
+// var width = window.innerWidth * 0.9
+// var height = window.innerHeight * 0.9
 var svg = d3.select('#force-directed')
+var width = $("#force-directed").parent().width()
+var height = width / 2
 svg.attr('width', width).attr('height', height)
 var linkElements,
   nodeElements,
@@ -339,24 +315,24 @@ function updateGraph() {
     // we link the selectNode method here
     // to update the graph on every click
     .on('click', selectNode)
-  .on("mouseover", function (node) {
-    tooltip.transition()
-      .duration(200)
-      .style("opacity", 1);
-    tooltip.html("<b>Newsportal:</b> " + node.id + "<br><br>" + Object.keys(node.results).map(result_key => "<b>" + result_key + "</b>: " + node.results[result_key].toString().substr(0, 5) + "<br>").reduce((acc, value) => acc + value))
-      .style("left", (d3.event.pageX + 60) + "px")
-      .style("top", (d3.event.pageY - 200) + "px")
-      .style("border", "1px solid black")
-      .style("border-radius", "4px")
-      .style("padding", "0.8rem")
-      .style("height", "fit-content")
-      .style("background-color", "white");
-  })
-  .on("mouseout", function (d) {
-    tooltip.transition()
-      .duration(500)
-      .style("opacity", 0);
-  });
+    .on("mouseover", function (node) {
+      tooltip.transition()
+        .duration(200)
+        .style("opacity", 1);
+      tooltip.html("<b>Newsportal:</b> " + node.id + "<br><br>" + Object.keys(node.results).map(result_key => "<b>" + result_key + "</b>: " + node.results[result_key].toString().substr(0, 5) + "<br>").reduce((acc, value) => acc + value))
+        .style("left", (d3.event.pageX + 60) + "px")
+        .style("top", (d3.event.pageY - 200) + "px")
+        .style("border", "1px solid black")
+        .style("border-radius", "4px")
+        .style("padding", "0.8rem")
+        .style("height", "fit-content")
+        .style("background-color", "white");
+    })
+    .on("mouseout", function (d) {
+      tooltip.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
   nodeElements = nodeEnter.merge(nodeElements)
   // texts
   textElements = textGroup.selectAll('text')
@@ -383,33 +359,32 @@ function updateSimulation() {
   let radius = 6;
   updateGraph()
   simulation.nodes(nodes).on('tick', () => {
-      nodeElements.attr("cx", function (d) {
-          return d.x = Math.max(radius, Math.min(width - radius, d.x));
-        })
-        .attr("cy", function (d) {
-          return d.y = Math.max(radius, Math.min(height - radius, d.y));
-        });
-      textElements.attr("x", function (d) {
-          return d.x = Math.max(radius, Math.min(width - radius, d.x));
-        })
-        .attr("y", function (d) {
-          return d.y = Math.max(radius, Math.min(height - radius, d.y));
-        });
+    nodeElements.attr("cx", function (d) {
+        return d.x = Math.max(radius, Math.min(width - radius, d.x));
+      })
+      .attr("cy", function (d) {
+        return d.y = Math.max(radius, Math.min(height - radius, d.y));
+      });
+    textElements.attr("x", function (d) {
+        return d.x = Math.max(radius, Math.min(width - radius, d.x));
+      })
+      .attr("y", function (d) {
+        return d.y = Math.max(radius, Math.min(height - radius, d.y));
+      });
 
-      linkElements.attr("x1", function (d) {
-          return d.source.x;
-        })
-        .attr("y1", function (d) {
-          return d.source.y;
-        })
-        .attr("x2", function (d) {
-          return d.target.x;
-        })
-        .attr("y2", function (d) {
-          return d.target.y;
-        });
-    }
-  )
+    linkElements.attr("x1", function (d) {
+        return d.source.x;
+      })
+      .attr("y1", function (d) {
+        return d.source.y;
+      })
+      .attr("x2", function (d) {
+        return d.target.x;
+      })
+      .attr("y2", function (d) {
+        return d.target.y;
+      });
+  })
   simulation.force('link').links(links)
   simulation.alphaTarget(0.7).restart()
 }
