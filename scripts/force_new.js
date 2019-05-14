@@ -21,7 +21,11 @@ async function fetchAsyncForce(url) {
   data = jsonData[url];
 
   width = $("#force-directed").parent().width()
-  height = width / 2;
+  if (window.matchMedia('(max-width: 767px)').matches) {
+    height = width
+  } else {
+    height = width / 2
+  }
 
   // group the data according to the newspaper
   let newspaper_lists = data.reduce((newspaper_aggregated, element) => {
@@ -178,7 +182,12 @@ function getTextColor(node, neighbors) {
 var svg = d3.select('#force-directed')
 var width = $("#force-directed").parent().width()
 var height = width / 2
-svg.attr('width', width).attr('height', height)
+if (window.matchMedia('(max-width: 767px)').matches) {
+  height = width
+}
+// svg.attr('width', width).attr('height', height)
+svg.attr("preserveAspectRatio", "xMinYMin meet")
+  .attr("viewBox", "0 0 " + width + " " + height)
 var linkElements,
   nodeElements,
   textElements
